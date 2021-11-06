@@ -19,7 +19,7 @@ describe("test Bargraph data", () => {
   it("parse data correctly", () => {
     const barGraph = new BarGraph();
     barGraph.getGraphData().then(data => {
-      expect(data).toEqual([{x: '00:00', y: 0}, {x: '00:30', y: 10}])
+      expect(data.graphData).toEqual([{x: '00:00', y: 0}, {x: '00:30', y: 10}])
     });
   });
 

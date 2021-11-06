@@ -18,6 +18,12 @@ interface ShakepayTransaction {
   'Blockchain Transaction ID': string,
 }
 
+interface ShakepayData {
+  trans: ShakepayTransaction[],
+  amountEarned: number,
+  totalShakes: number,
+}
+
 export default class ShakepayAPI {
 
   fileName = "transactions_summary.csv";
@@ -25,9 +31,11 @@ export default class ShakepayAPI {
   // get number of shakes per half hour in associative array
   async getShakeTimeData() : Promise<any>
   {
-    return this.getAllTransactions('shakingsats').then( (transactions) => {
+    return this.getAllTransactions('shakingsats').then( (data) => {
       let chartData = this.initTransactionData();
-      transactions.forEach(transaction => {
+      let amountEarned = data.amountEarned;
+      let totalShakes = data.totalShakes;
+      data.trans.forEach(transaction => {
 
         let date = new Date(Date.parse(transaction.Date.replace('+00', '+00:00')));
         let minutes;
@@ -43,7 +51,7 @@ export default class ShakepayAPI {
         chartData[key]++;
       });
 
-      return chartData;
+      return {chartData, amountEarned, totalShakes};
     });
   }
 
@@ -67,12 +75,13 @@ export default class ShakepayAPI {
   }
 
   // Get records from file
-  getAllTransactions(transactionFilter = '') : Promise<ShakepayTransaction[]>
+  getAllTransactions(transactionFilter = '') : Promise<ShakepayData>
   {
     // TODO: check if file exists first
-    const transactions: Promise<ShakepayTransaction[]> = new Promise((resolve, reject) => {
+    const transactions: Promise<ShakepayData> = new Promise((resolve, reject) => {
       let trans: Array<ShakepayTransaction> = [];
-      let amount_earned = 0;
+      let amountEarned = 0;
+      let totalShakes = 0;
 
       fs.createReadStream(path.resolve(__dirname, '../../data', this.fileName))
         .pipe(csv.parse({ headers: true }))
@@ -86,7 +95,8 @@ export default class ShakepayAPI {
               trans.push(row);
 
               // get amount of bitcoin earn from shaking
-              amount_earned += parseFloat(row['Amount Credited']);
+              amountEarned += parseFloat(row['Amount Credited']);
+              totalShakes++;
             }
           } else {
             trans.push(row);
@@ -94,9 +104,7 @@ export default class ShakepayAPI {
           
         })
         .on('end', (rowCount: number) => {
-          // TODO: get amount earned out and display to front end
-          console.log(`Total BTC earned from shaking ${amount_earned.toFixed(8)}`);
-          resolve(trans);
+          resolve({trans, totalShakes, amountEarned: +amountEarned.toFixed(8)});
         });
       });
     return transactions;

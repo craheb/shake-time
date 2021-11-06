@@ -16,15 +16,19 @@ function getLabels(data) {
 
 function App() {
 
-  const [data, setData] = React.useState(null);
+  const [graphData, setGraphData] = React.useState(null);
+  const [totalShakes, setTotalShakes] = React.useState(null);
+  const [amountEarned, setAmountEarned] = React.useState(null);
 
   let labels = [];
   React.useEffect(() => {
     fetch("/api/shakes")
       .then((res) => res.json())
       .then((data) => {
-        labels = getLabels(data);
-        setData(data)
+        labels = getLabels(data.graphData);
+        setGraphData(data.graphData)
+        setTotalShakes(data.totalShakes)
+        setAmountEarned(data.amountEarned)
       });
   }, []);
 
@@ -33,7 +37,7 @@ function App() {
     datasets: [
       {
         label: 'Shakes',
-        data: data,
+        data: graphData,
         borderWidth: 1,
         backgroundColor: ["#009FFF"],
       },
@@ -43,6 +47,8 @@ function App() {
 
   return ( 
     <div className="App">
+      <div>Total shakes: {totalShakes}</div>
+      <div>Total earned from shakes: {amountEarned} BTC</div>
       <Bar data={barData}  />
     </div>
   );

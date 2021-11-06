@@ -1,4 +1,6 @@
 This app lets you view the time of day you shake most in form a bar graph.
+![Screen Shot 2021-11-06 at 12 20 10 AM](https://user-images.githubusercontent.com/2626278/140597471-6bac77e9-2c36-4a55-962f-8055b38d4945.png)
+
 
 An export of your transactions is needed and act as the api.
 

@@ -13,8 +13,12 @@ app.get( "/", ( req, res ) => {
 app.get("/api/shakes", (req, res) => {
   const barGraph = new BarGraph();
 
-  barGraph.getGraphData().then((graphData) => {
-    res.json(graphData);
+  barGraph.getGraphData().then((data) => {
+    res.json({
+      graphData: data.graphData, 
+      amountEarned: data.amountEarned, 
+      totalShakes: data.totalShakes
+    });
   });
 });
 
