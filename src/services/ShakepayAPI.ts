@@ -72,6 +72,7 @@ export default class ShakepayAPI {
     // TODO: check if file exists first
     const transactions: Promise<ShakepayTransaction[]> = new Promise((resolve, reject) => {
       let trans: Array<ShakepayTransaction> = [];
+      let amount_earned = 0;
 
       fs.createReadStream(path.resolve(__dirname, '../../data', this.fileName))
         .pipe(csv.parse({ headers: true }))
@@ -83,6 +84,9 @@ export default class ShakepayAPI {
           if (transactionFilter) {
             if (transactionFilter === row['Transaction Type']) {
               trans.push(row);
+
+              // get amount of bitcoin earn from shaking
+              amount_earned += parseFloat(row['Amount Credited']);
             }
           } else {
             trans.push(row);
@@ -90,10 +94,11 @@ export default class ShakepayAPI {
           
         })
         .on('end', (rowCount: number) => {
+          // TODO: get amount earned out and display to front end
+          console.log(`Total BTC earned from shaking ${amount_earned.toFixed(8)}`);
           resolve(trans);
         });
       });
-
     return transactions;
   }
 }
